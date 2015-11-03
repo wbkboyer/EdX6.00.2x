@@ -1,6 +1,7 @@
 # 6.00.2x Problem Set 2: Simulating robots
 
 import math
+import sys
 import random
 
 import ps2_visualize
@@ -58,6 +59,7 @@ class Position(object):
         return "(%0.2f, %0.2f)" % (self.x, self.y)
 
 
+
 # === Problem 1
 class RectangularRoom(object):
     """
@@ -76,7 +78,26 @@ class RectangularRoom(object):
         width: an integer > 0
         height: an integer > 0
         """
-        raise NotImplementedError
+        if width > 0 and height > 0:
+            self.width = width
+            self.height = height
+
+            self.room = []
+            for i in range(self.width): # columns
+                self.room.append([])
+                for j in range(self.height): # rows; each room starts dirty
+                    self.room[i].append('D')
+
+        else:
+            raise ValueError
+
+        #
+
+        # By convention, we will refer to the tiles using ordered pairs of integers:
+        # (0, 0), (0, 1), ..., (0, h-1), (1, 0), (1, 1), ..., (w-1, h-1).
+
+        #
+
     
     def cleanTileAtPosition(self, pos):
         """
@@ -86,7 +107,7 @@ class RectangularRoom(object):
 
         pos: a Position
         """
-        raise NotImplementedError
+        self.room[int(math.floor(pos.getX()))][int(math.floor(pos.getY()))] = 'C'
 
     def isTileCleaned(self, m, n):
         """
@@ -98,7 +119,10 @@ class RectangularRoom(object):
         n: an integer
         returns: True if (m, n) is cleaned, False otherwise
         """
-        raise NotImplementedError
+        if self.room[m][n] == 'C':
+            return True
+        else:
+            return False
     
     def getNumTiles(self):
         """
@@ -106,7 +130,7 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
+        return self.width * self.height
 
     def getNumCleanedTiles(self):
         """
@@ -114,7 +138,14 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
+        numCleanedTiles = 0
+
+        for i in range(self.width):
+            for j in range(self.height):
+                if self.room[i][j] == 'C':
+                    numCleanedTiles += 1
+
+        return numCleanedTiles
 
     def getRandomPosition(self):
         """
@@ -122,7 +153,7 @@ class RectangularRoom(object):
 
         returns: a Position object.
         """
-        raise NotImplementedError
+        return Position(random.randint(0,self.width-1), random.randint(0,self.height-1))
 
     def isPositionInRoom(self, pos):
         """
@@ -131,7 +162,10 @@ class RectangularRoom(object):
         pos: a Position object.
         returns: True if pos is in the room, False otherwise.
         """
-        raise NotImplementedError
+        if math.floor(pos.getX()) in range(self.width) and math.floor(pos.getY()) in range(self.height):
+            return True
+        else:
+            return False
 
 
 class Robot(object):
@@ -317,3 +351,6 @@ def showPlot2(title, x_label, y_label):
 #
 #       (... your call here ...)
 #
+
+rr = RectangularRoom(5,5)
+print rr.room
