@@ -89,7 +89,7 @@ class RectangularRoom(object):
                     self.room[i].append('D')
 
         else:
-            raise ValueError
+            raise ValueError, "Must enter room width and height both greater than 0"
 
         #
 
@@ -187,7 +187,24 @@ class Robot(object):
         room:  a RectangularRoom object.
         speed: a float (speed > 0)
         """
-        raise NotImplementedError
+        if isinstance(room, RectangularRoom):
+            self.room = room
+        else:
+            raise TypeError, "Must pass valid instance of RectangularRoom"
+
+        if speed > 0:
+            self.speed = speed
+        else:
+            raise ValueError, "Must enter speed > 0"
+        # The robot starts out at some random position in the room...
+        self.position = self.room.getRandomPosition()
+        # ... and with a random direction of motion.
+        # A robot has a direction of motion. We'll represent the direction using an integer d
+        # satisfying 0 <= d < 360, which gives an angle in degrees.
+        self.d = random.randrange(0, 360)
+
+        # When a Robot is initialized, it should clean the first tile it is initialized on.
+        self.room.cleanTileAtPosition(self.position)
 
     def getRobotPosition(self):
         """
@@ -195,7 +212,7 @@ class Robot(object):
 
         returns: a Position object giving the robot's position.
         """
-        raise NotImplementedError
+        return self.position
     
     def getRobotDirection(self):
         """
@@ -204,7 +221,7 @@ class Robot(object):
         returns: an integer d giving the direction of the robot as an angle in
         degrees, 0 <= d < 360.
         """
-        raise NotImplementedError
+        return self.d
 
     def setRobotPosition(self, position):
         """
@@ -212,7 +229,10 @@ class Robot(object):
 
         position: a Position object.
         """
-        raise NotImplementedError
+        if isinstance(position, Position):
+            self.position = position
+        else:
+            raise TypeError, "Must pass valid instance of Position"
 
     def setRobotDirection(self, direction):
         """
@@ -220,7 +240,10 @@ class Robot(object):
 
         direction: integer representing an angle in degrees
         """
-        raise NotImplementedError
+        if math.floor(direction) in range(360):
+            self.d = direction
+        else:
+            raise ValueError, "Must enter direction d in [0, 360)"
 
     def updatePositionAndClean(self):
         """
@@ -248,10 +271,24 @@ class StandardRobot(Robot):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        # Set the robot's destination position by getting it's current position, and then with that
+        # position, invoking getNewPosition with the robot's current direction and perpetual
+        # speed.
+
+        while True:
+            newPos = self.getRobotPosition().getNewPosition(self.getRobotDirection(), self.speed)
+            # if the current direction will make you hit a wall, change direction and try again
+            if not (math.floor(newPos.getX()) in range(self.room.width) and math.floor(newPos.getY()) in range(self.room.height)):
+                self.setRobotDirection(random.random() * 360)
+                continue
+            # else, use the current direction to set the Robot's position
+            else:
+                self.setRobotPosition(newPos)
+                self.room.cleanTileAtPosition(self.getRobotPosition())
+                break
 
 # Uncomment this line to see your implementation of StandardRobot in action!
-##testRobotMovement(StandardRobot, RectangularRoom)
+#testRobotMovement(StandardRobot, RectangularRoom)
 
 
 # === Problem 3
@@ -273,10 +310,29 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot_type: class of robot to be instantiated (e.g. StandardRobot or
                 RandomWalkRobot)
     """
-    raise NotImplementedError
+    sumSteps = 0.0
+
+    for i in range(num_trials):
+        room = RectangularRoom(width, height)
+        robots = []
+
+        # initialize list of num_robots robots in the same room
+        for j in range(num_robots):
+            robots.append(robot_type(room, speed))
+        steps = 0
+        while float(room.getNumCleanedTiles())/room.getNumTiles() < min_coverage:
+            # execute one time-step for all the robots in the list
+            for robot in robots:
+                robot.updatePositionAndClean()
+            steps += 1
+
+        sumSteps += steps
+
+    return sumSteps/num_trials
+
 
 # Uncomment this line to see how much your simulation takes on average
-##print  runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
+print runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
 
 
 # === Problem 4
@@ -351,6 +407,3 @@ def showPlot2(title, x_label, y_label):
 #
 #       (... your call here ...)
 #
-
-rr = RectangularRoom(5,5)
-print rr.room
