@@ -332,7 +332,7 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
 
 
 # Uncomment this line to see how much your simulation takes on average
-print runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
+#print runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
 
 
 # === Problem 4
@@ -348,8 +348,26 @@ class RandomWalkRobot(Robot):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        # Set the robot's destination position by getting it's current position, and then with that
+        # position, invoking getNewPosition with the robot's current direction and perpetual
+        # speed.
 
+        while True:
+            # A modification of the StandardRobot, whereby we change the direction first thing, then continue as before
+            self.setRobotDirection(random.random() * 360)
+            newPos = self.getRobotPosition().getNewPosition(self.getRobotDirection(), self.speed)
+            # if the current direction will make you hit a wall, change direction and try again
+            if not (math.floor(newPos.getX()) in range(self.room.width) and math.floor(newPos.getY()) in range(self.room.height)):
+                self.setRobotDirection(random.random() * 360)
+                continue
+            # else, use the current direction to set the Robot's position
+            else:
+                self.setRobotPosition(newPos)
+                self.room.cleanTileAtPosition(self.getRobotPosition())
+                break
+
+# Uncomment this line to see your implementation of RandomWalkRobot in action!
+testRobotMovement(RandomWalkRobot, RectangularRoom)
 
 def showPlot1(title, x_label, y_label):
     """
@@ -398,12 +416,10 @@ def showPlot2(title, x_label, y_label):
 # 1) Write a function call to showPlot1 that generates an appropriately-labeled
 #     plot.
 #
-#       (... your call here ...)
-#
+#showPlot1('Time-steps taken for 1-10 robots to clean at least 80% of a room', 'Num. Robots', 'Time-steps')
 
 #
 # 2) Write a function call to showPlot2 that generates an appropriately-labeled
 #     plot.
 #
-#       (... your call here ...)
-#
+#showPlot2('bla', 'blat', 'blarg')
