@@ -38,12 +38,12 @@ def noReplacementSimulation(numTrials):
 
     sameColourDrawn = 0.0
     for i in range(numTrials):
-        sameColourDrawn += drawBalls(3, 3, 3)
+        sameColourDrawn += drawBalls(4, 4, 3)
 
     return sameColourDrawn/numTrials
 
 if __name__ == '__main__':
     #for i in range(10):
-    print(noReplacementSimulation(5000))
+    print(noReplacementSimulation(1000000))
 
 
