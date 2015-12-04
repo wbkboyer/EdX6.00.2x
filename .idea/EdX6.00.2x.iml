@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/ProblemSet2" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ProblemSet3" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 2.7.6 virtualenv at ~/mathcomputing" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
